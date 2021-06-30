@@ -1,16 +1,5 @@
 import qjs from "quickjs-emscripten"
 
-/**
- * Put test script here
- */
-const testScript = `
-  pw.test("hello", () => {
-    pw.expect(10).toBe(10);
-    pw.expect(10).not.toBe(10);
-    pw.expect(10).toBe(10);
-  });
-`;
-
 export type TestDescriptor = {
   /**
    * The name of the test block
@@ -51,7 +40,44 @@ function createExpectation(vm: qjs.QuickJSVm, expectVal: any, negated: boolean, 
     return { value: vm.undefined };
   });
 
+  const toBeLevel2xxHandle = vm.newFunction("toBeLevel2xx", () => {
+    let assertion = expectVal >= 200 && expectVal <= 299;
+    if (negated) assertion = !assertion;
+    
+    currTestStack[currTestStack.length - 1].expectResults.push(assertion);
+    return { value: vm.undefined };
+  });
+
+  const toBeLevel3xxHandle = vm.newFunction("toBeLevel3xx", () => {
+    let assertion = expectVal >= 300 && expectVal <= 399;
+    if (negated) assertion = !assertion;
+    
+    currTestStack[currTestStack.length - 1].expectResults.push(assertion);
+    return { value: vm.undefined };
+  });
+
+  const toBeLevel4xxHandle = vm.newFunction("toBeLevel4xx", () => {
+    let assertion = expectVal >= 400 && expectVal <= 499;
+    if (negated) assertion = !assertion;
+    
+    currTestStack[currTestStack.length - 1].expectResults.push(assertion);
+    return { value: vm.undefined };
+  });
+
+  const toBeLevel5xxHandle = vm.newFunction("toBeLevel5xx", () => {
+    let assertion = expectVal >= 500 && expectVal <= 599;
+    if (negated) assertion = !assertion;
+    
+    currTestStack[currTestStack.length - 1].expectResults.push(assertion);
+    return { value: vm.undefined };
+  });
+
   vm.setProp(resultHandle, "toBe", toBeFnHandle);
+  vm.setProp(resultHandle, "toBeLevel2xx", toBeLevel2xxHandle);
+  vm.setProp(resultHandle, "toBeLevel3xx", toBeLevel3xxHandle);
+  vm.setProp(resultHandle, "toBeLevel4xx", toBeLevel4xxHandle);
+  vm.setProp(resultHandle, "toBeLevel5xx", toBeLevel5xxHandle);
+
   vm.defineProp(resultHandle, "not", {
     get: () => {
       return createExpectation(vm, expectVal, !negated, currTestStack);
@@ -59,6 +85,10 @@ function createExpectation(vm: qjs.QuickJSVm, expectVal: any, negated: boolean, 
   })
 
   toBeFnHandle.dispose();
+  toBeLevel2xxHandle.dispose();
+  toBeLevel3xxHandle.dispose();
+  toBeLevel4xxHandle.dispose();
+  toBeLevel5xxHandle.dispose();
 
   return resultHandle;
 }
