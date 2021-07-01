@@ -72,11 +72,31 @@ function createExpectation(vm: qjs.QuickJSVm, expectVal: any, negated: boolean, 
     return { value: vm.undefined };
   });
 
+  const toBeTypeHandle = vm.newFunction("toBeType", (expectedValHandle) => {
+    const expectedType = vm.getString(expectedValHandle);
+    let assertion = (typeof expectVal) === expectedType;
+    if (negated) assertion = !assertion;
+
+    currTestStack[currTestStack.length - 1].expectResults.push(assertion);
+    return { value: vm.undefined };
+  });
+
+  const toHaveLengthHandle = vm.newFunction("toHaveLength", (expectedValHandle) => {
+    const expectedLength = vm.getNumber(expectedValHandle);
+    let assertion = (expectVal as any[]).length === expectedLength;
+    if (negated) assertion = !assertion;
+
+    currTestStack[currTestStack.length - 1].expectResults.push(assertion);
+    return { value: vm.undefined };
+  });
+
   vm.setProp(resultHandle, "toBe", toBeFnHandle);
   vm.setProp(resultHandle, "toBeLevel2xx", toBeLevel2xxHandle);
   vm.setProp(resultHandle, "toBeLevel3xx", toBeLevel3xxHandle);
   vm.setProp(resultHandle, "toBeLevel4xx", toBeLevel4xxHandle);
   vm.setProp(resultHandle, "toBeLevel5xx", toBeLevel5xxHandle);
+  vm.setProp(resultHandle, "toBeType", toBeTypeHandle);
+  vm.setProp(resultHandle, "toHaveLength", toHaveLengthHandle);
 
   vm.defineProp(resultHandle, "not", {
     get: () => {
@@ -89,6 +109,8 @@ function createExpectation(vm: qjs.QuickJSVm, expectVal: any, negated: boolean, 
   toBeLevel3xxHandle.dispose();
   toBeLevel4xxHandle.dispose();
   toBeLevel5xxHandle.dispose();
+  toBeTypeHandle.dispose();
+  toHaveLengthHandle.dispose();
 
   return resultHandle;
 }
