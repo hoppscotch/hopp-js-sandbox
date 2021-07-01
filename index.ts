@@ -1,13 +1,16 @@
-import { execTestScript, TestDescriptor } from "./test-runner";
+import { execTestScript, TestDescriptor } from "./test-runner"
 
-export async function runTestScript(testScript: string): Promise<TestDescriptor> {
-  return (await execTestScript(testScript))[0];
+export async function runTestScript(
+  testScript: string
+): Promise<TestDescriptor> {
+  return (await execTestScript(testScript))[0]
 }
 
+// eslint-disable-next-line prettier/prettier
 (async () => {
-console.dir(
-  await runTestScript(
-    `
+  console.dir(
+    await runTestScript(
+      `
     pw.test("Arithmetic operations and toBe", () => {
       const size = 500 + 500;
       pw.expect(size).toBe(1000);
@@ -41,8 +44,9 @@ console.dir(
       pw.expect(arr).not.toHaveLength(4);
     });
     `
-  ), {
-    depth: 100
-  }
-)
+    ),
+    {
+      depth: 100,
+    }
+  )
 })()
