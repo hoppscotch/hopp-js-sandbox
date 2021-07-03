@@ -2,11 +2,16 @@
   "name": "hopp-js-sandbox",
   "version": "0.1.0",
   "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "demo": "esrun src/index.ts",
     "lint": "eslint --ext .ts,.js --ignore-path .gitignore",
     "prepare": "husky install",
-    "test": "npx jest"
+    "test": "npx jest",
+    "build": "npx tsc",
+    "clean": "npx tsc --build --clean",
+    "prepublish": "npm run build"
   },
   "keywords": [],
   "author": "",
