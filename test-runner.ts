@@ -1,4 +1,4 @@
-import qjs from "quickjs-emscripten"
+import * as qjs from "quickjs-emscripten"
 
 export type TestDescriptor = {
   /**
