@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "scripts": {
-    "demo": "esrun index.ts",
+    "demo": "esrun src/index.ts",
     "lint": "eslint --ext .ts,.js --ignore-path .gitignore",
     "prepare": "husky install",
     "test": "npx jest"
