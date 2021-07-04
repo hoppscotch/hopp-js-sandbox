@@ -2,8 +2,8 @@
   "name": "hopp-js-sandbox",
   "version": "0.1.0",
   "description": "",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "demo": "esrun src/demo.ts",
     "lint": "eslint --ext .ts,.js --ignore-path .gitignore",
