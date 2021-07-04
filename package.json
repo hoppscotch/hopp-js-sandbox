@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "",
   "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "types": "./lib/",
+  "type": "module",
   "scripts": {
     "demo": "esrun src/demo.ts",
     "lint": "eslint --ext .ts,.js --ignore-path .gitignore",

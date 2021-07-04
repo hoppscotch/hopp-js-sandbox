@@ -6,7 +6,6 @@
     "lib": ["ESNext", "ESNext.AsyncIterable", "DOM"],
     "esModuleInterop": true,
     "strict": true,
-    "baseUrl": "./src",
     "paths": {
       "~/*": ["./src/*"],
       "@/*": ["./src/*"]
@@ -18,6 +17,8 @@
     "outDir": "./lib/",
     "rootDir": "./src/",
     "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
   },
   "include": ["./src"],
   "exclude": ["node_modules", "./src/__tests__", "./src/demo.ts"]
