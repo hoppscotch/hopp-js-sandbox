@@ -1,7 +1,7 @@
 {
-  "name": "hopp-js-sandbox",
+  "name": "@hoppscotch/js-sandbox",
   "version": "0.1.0",
-  "description": "",
+  "description": "JavaScript sandboxes for running external scripts used by Hoppscotch clients",
   "main": "./lib/index.js",
   "types": "./lib/",
   "type": "module",
@@ -14,8 +14,8 @@
     "clean": "npx tsc --build --clean",
     "prepublish": "npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["hoppscotch", "sandbox", "js-sandbox", "apis", "test-runner"],
+  "author": "The Hoppscotch Team <support@hoppscotch.io> (https://hoppscotch.com/)",
   "license": "MIT",
   "dependencies": {
     "quickjs-emscripten": "^0.13.0"
