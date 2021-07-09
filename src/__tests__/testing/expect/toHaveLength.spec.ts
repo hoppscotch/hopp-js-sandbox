@@ -11,7 +11,10 @@ describe("toHaveLength", () => {
       )
     ).resolves.toEqual([
       expect.objectContaining({
-        expectResults: [true, true],
+        expectResults: [
+          { status: "pass" },
+          { status: "pass" },
+        ],
       }),
     ])
   })
@@ -26,7 +29,10 @@ describe("toHaveLength", () => {
       )
     ).resolves.toEqual([
       expect.objectContaining({
-        expectResults: [false, false],
+        expectResults: [
+          { status: "fail", message: "Expected the array to be of length '4'" },
+          { status: "fail", message: "Expected the array to be of length '0'" },
+        ],
       }),
     ])
   })
@@ -41,7 +47,10 @@ describe("toHaveLength", () => {
       )
     ).resolves.toEqual([
       expect.objectContaining({
-        expectResults: [false, false],
+        expectResults: [
+          { status: "fail", message: "Expected the array to not be of length '4'" },
+          { status: "fail", message: "Expected the array to not be of length '0'" },
+        ],
       }),
     ])
   })
@@ -56,8 +65,79 @@ describe("toHaveLength", () => {
       )
     ).resolves.toEqual([
       expect.objectContaining({
-        expectResults: [true, true],
+        expectResults: [
+          { status: "pass" },
+          { status: "pass" },
+        ],
       }),
+    ])
+  })
+
+  test("gives error if not called on an array or a string with no negation", () => {
+    return expect(
+      execTestScript(
+        `
+          pw.expect(5).toHaveLength(0)
+          pw.expect(true).toHaveLength(0)
+        `
+      )
+    ).resolves.toEqual([
+      expect.objectContaining({
+        expectResults: [
+          { status: "error", message: "Expected toHaveLength to be called for an array or string" },
+          { status: "error", message: "Expected toHaveLength to be called for an array or string" },
+        ]
+      })
+    ])
+  })
+
+  test("gives error if not called on an array or a string with negation", () => {
+    return expect(
+      execTestScript(
+        `
+          pw.expect(5).not.toHaveLength(0)
+          pw.expect(true).not.toHaveLength(0)
+        `
+      )
+    ).resolves.toEqual([
+      expect.objectContaining({
+        expectResults: [
+          { status: "error", message: "Expected toHaveLength to be called for an array or string" },
+          { status: "error", message: "Expected toHaveLength to be called for an array or string" },
+        ]
+      })
+    ])
+  })
+
+  test("gives an error if toHaveLength parameter is not a number without negation", () => {
+    return expect(
+      execTestScript(
+        `
+          pw.expect([1, 2, 3, 4]).toHaveLength("a")
+        `
+      )
+    ).resolves.toEqual([
+      expect.objectContaining({
+        expectResults: [
+          { status: "error", message: "Argument for toHaveLength should be a number" },
+        ],
+      })
+    ])
+  })
+
+  test("gives an error if toHaveLength parameter is not a number with negation", () => {
+    return expect(
+      execTestScript(
+        `
+          pw.expect([1, 2, 3, 4]).not.toHaveLength("a")
+        `
+      )
+    ).resolves.toEqual([
+      expect.objectContaining({
+        expectResults: [
+          { status: "error", message: "Argument for toHaveLength should be a number" },
+        ],
+      })
     ])
   })
 })

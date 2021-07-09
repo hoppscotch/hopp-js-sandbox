@@ -1,5 +1,16 @@
 import * as qjs from "quickjs-emscripten"
 
+/**
+ * The result of an expectation statement
+ */
+type ExpectResult =
+  | { status: "pass" } // The expectation was satisfied
+  | { status: "fail" | "error", message: string } // The expectation failed (fail) or errored (error)
+
+/**
+ * An object defining the result of the execution of a
+ * test blocK
+ */
 export type TestDescriptor = {
   /**
    * The name of the test block
@@ -9,7 +20,7 @@ export type TestDescriptor = {
   /**
    * Expectation results of the test block
    */
-  expectResults: boolean[]
+  expectResults: ExpectResult[]
 
   /**
    * Children test blocks (test blocks inside the test block)
@@ -39,60 +50,191 @@ function createExpectation(
     let assertion = expectVal === expectedVal
     if (negated) assertion = !assertion
 
-    currTestStack[currTestStack.length - 1].expectResults.push(assertion)
+    if (assertion) {
+      currTestStack[currTestStack.length - 1].expectResults.push({ 
+        status: "pass" 
+      })
+    } else {
+      currTestStack[currTestStack.length - 1].expectResults.push({
+        status: "fail",
+        message: `Expected '${expectVal}' to${negated ? " not" : ""} be '${expectedVal}'`,
+      })
+    }
 
     return { value: vm.undefined }
   })
 
   const toBeLevel2xxHandle = vm.newFunction("toBeLevel2xx", () => {
-    let assertion = expectVal >= 200 && expectVal <= 299
-    if (negated) assertion = !assertion
+    // Check if the expected value is a number, else it is an error
+    if (typeof expectVal === "number" && !Number.isNaN(expectVal)) {
+      let assertion = expectVal >= 200 && expectVal <= 299
+      if (negated) assertion = !assertion
 
-    currTestStack[currTestStack.length - 1].expectResults.push(assertion)
+      if (assertion) {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "pass",
+        })
+      } else {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "fail",
+          message:
+            `Expected '${expectVal}' to${negated ? " not" : ""} be 200-level status`,
+        })
+      }
+    } else {
+      currTestStack[currTestStack.length - 1].expectResults.push({
+        status: "error",
+        message: `Expected 200-level status but could not parse value '${expectVal}'`,
+      })
+    }
+
     return { value: vm.undefined }
   })
 
   const toBeLevel3xxHandle = vm.newFunction("toBeLevel3xx", () => {
-    let assertion = expectVal >= 300 && expectVal <= 399
-    if (negated) assertion = !assertion
+    // Check if the expected value is a number, else it is an error
+    if (typeof expectVal === "number" && !Number.isNaN(expectVal)) {
+      let assertion = expectVal >= 300 && expectVal <= 399
+      if (negated) assertion = !assertion
 
-    currTestStack[currTestStack.length - 1].expectResults.push(assertion)
+      if (assertion) {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "pass",
+        })
+      } else {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "fail",
+          message:
+            `Expected '${expectVal}' to${negated ? " not" : ""} be 300-level status`,
+        })
+      }
+    } else {
+      currTestStack[currTestStack.length - 1].expectResults.push({
+        status: "error",
+        message: `Expected 300-level status but could not parse value '${expectVal}'`,
+      })
+    }
+
     return { value: vm.undefined }
   })
 
   const toBeLevel4xxHandle = vm.newFunction("toBeLevel4xx", () => {
-    let assertion = expectVal >= 400 && expectVal <= 499
-    if (negated) assertion = !assertion
+    // Check if the expected value is a number, else it is an error
+    if (typeof expectVal === "number" && !Number.isNaN(expectVal)) {
+      let assertion = expectVal >= 400 && expectVal <= 499
+      if (negated) assertion = !assertion
 
-    currTestStack[currTestStack.length - 1].expectResults.push(assertion)
+      if (assertion) {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "pass",
+        })
+      } else {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "fail",
+          message:
+            `Expected '${expectVal}' to${negated ? " not" : ""} be 400-level status`,
+        })
+      }
+    } else {
+      currTestStack[currTestStack.length - 1].expectResults.push({
+        status: "error",
+        message: `Expected 400-level status but could not parse value '${expectVal}'`,
+      })
+    }
+
     return { value: vm.undefined }
   })
 
   const toBeLevel5xxHandle = vm.newFunction("toBeLevel5xx", () => {
-    let assertion = expectVal >= 500 && expectVal <= 599
-    if (negated) assertion = !assertion
+    // Check if the expected value is a number, else it is an error
+    if (typeof expectVal === "number" && !Number.isNaN(expectVal)) {
+      let assertion = expectVal >= 500 && expectVal <= 599
+      if (negated) assertion = !assertion
 
-    currTestStack[currTestStack.length - 1].expectResults.push(assertion)
+      if (assertion) {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "pass",
+        })
+      } else {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "fail",
+          message: `Expected '${expectVal}' to${negated ? " not" : ""} be 500-level status`
+        })
+      }
+    } else {
+      currTestStack[currTestStack.length - 1].expectResults.push({
+        status: "error",
+        message: `Expected 500-level status but could not parse value '${expectVal}'`,
+      })
+    }
+    
     return { value: vm.undefined }
   })
 
   const toBeTypeHandle = vm.newFunction("toBeType", (expectedValHandle) => {
-    const expectedType = vm.getString(expectedValHandle)
-    let assertion = typeof expectVal === expectedType
-    if (negated) assertion = !assertion
+    const expectedType = vm.dump(expectedValHandle)
 
-    currTestStack[currTestStack.length - 1].expectResults.push(assertion)
+    // Check if the expectation param is a valid type name string, else error
+    if (["string", "boolean", "number", "object", "undefined", "bigint", "symbol", "function"].includes(expectedType)) {
+      let assertion = typeof expectVal === expectedType
+      if (negated) assertion = !assertion
+
+      if (assertion) {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "pass",
+        })
+      } else {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "fail",
+          message: `Expected '${expectVal}' to${negated ? " not" : ""} be type '${expectedType}'`,
+        })
+      }
+    } else {
+      currTestStack[currTestStack.length - 1].expectResults.push({
+        status: "error",
+        message: `Argument for toBeType should be "string", "boolean", "number", "object", "undefined", "bigint", "symbol" or "function"`
+      })
+    }
+
     return { value: vm.undefined }
   })
 
   const toHaveLengthHandle = vm.newFunction(
     "toHaveLength",
     (expectedValHandle) => {
-      const expectedLength = vm.getNumber(expectedValHandle)
-      let assertion = (expectVal as any[]).length === expectedLength
-      if (negated) assertion = !assertion
+      const expectedLength = vm.dump(expectedValHandle)
 
-      currTestStack[currTestStack.length - 1].expectResults.push(assertion)
+      if (!(Array.isArray(expectVal) || typeof expectVal === "string")) {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "error",
+          message: `Expected toHaveLength to be called for an array or string`,
+        })
+
+        return { value: vm.undefined }
+      }
+
+      // Check if the parameter is a number, else error
+      if (typeof expectedLength === "number" && !Number.isNaN(expectedLength)) {
+        let assertion = (expectVal as any[]).length === expectedLength
+        if (negated) assertion = !assertion
+        
+        if (assertion) {
+          currTestStack[currTestStack.length - 1].expectResults.push({
+            status: "pass",
+          })
+        } else {
+          currTestStack[currTestStack.length - 1].expectResults.push({
+            status: "fail",
+            message: `Expected the array to${negated ? " not" : ""} be of length '${expectedLength}'`
+          })
+        }
+      } else {
+        currTestStack[currTestStack.length - 1].expectResults.push({
+          status: "error",
+          message: `Argument for toHaveLength should be a number`
+        })
+      }
+      
       return { value: vm.undefined }
     }
   )

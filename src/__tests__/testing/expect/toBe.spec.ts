@@ -11,7 +11,7 @@ describe("toBe", () => {
         )
       ).resolves.toEqual([
         expect.objectContaining({
-          expectResults: [true],
+          expectResults: [{ status: "pass" }],
         }),
       ])
     })
@@ -25,7 +25,7 @@ describe("toBe", () => {
         )
       ).resolves.toEqual([
         expect.objectContaining({
-          expectResults: [false],
+          expectResults: [{ status: "fail", message: "Expected '2' to be '4'" }],
         }),
       ])
     })
@@ -41,7 +41,10 @@ describe("toBe", () => {
         )
       ).resolves.toEqual([
         expect.objectContaining({
-          expectResults: [false],
+          expectResults: [{
+            status: "fail",
+            message: "Expected '2' to not be '2'",
+          }],
         }),
       ])
     })
@@ -55,7 +58,9 @@ describe("toBe", () => {
         )
       ).resolves.toEqual([
         expect.objectContaining({
-          expectResults: [true],
+          expectResults: [{
+            status: "pass",
+          }],
         }),
       ])
     })
@@ -71,7 +76,10 @@ test("strict checks types", () => {
     )
   ).resolves.toEqual([
     expect.objectContaining({
-      expectResults: [false],
+      expectResults: [{
+        status: "fail",
+        message: "Expected '2' to be '2'",
+      }],
     }),
   ])
 })
