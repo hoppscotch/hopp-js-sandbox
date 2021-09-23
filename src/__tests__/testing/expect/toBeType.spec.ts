@@ -1,4 +1,10 @@
-import { execTestScript } from "../../../test-runner"
+import { execTestScript, TestResponse } from "../../../test-runner"
+
+const fakeResponse: TestResponse = {
+  status: 200,
+  body: "hoi",
+  headers: []
+}
 
 describe("toBeType", () => {
   test("asserts true for valid type expectations with no negation", () => {
@@ -10,9 +16,9 @@ describe("toBeType", () => {
           pw.expect(true).toBeType("boolean")
           pw.expect({}).toBeType("object")
           pw.expect(undefined).toBeType("undefined")
-        `
-      )
-    ).resolves.toEqual([
+        `, fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "pass" }, 
@@ -34,9 +40,10 @@ describe("toBeType", () => {
           pw.expect(true).toBeType("string")
           pw.expect({}).toBeType("number")
           pw.expect(undefined).toBeType("number")
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "fail", message: `Expected '2' to be type 'string'`},
@@ -58,9 +65,9 @@ describe("toBeType", () => {
           pw.expect(true).not.toBeType("boolean")
           pw.expect({}).not.toBeType("object")
           pw.expect(undefined).not.toBeType("undefined")
-        `
-      )
-    ).resolves.toEqual([
+        `, fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "fail", message: `Expected '2' to not be type 'number'` },
@@ -82,9 +89,10 @@ describe("toBeType", () => {
           pw.expect(true).not.toBeType("string")
           pw.expect({}).not.toBeType("number")
           pw.expect(undefined).not.toBeType("number")
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "pass" },
@@ -106,9 +114,10 @@ describe("toBeType", () => {
           pw.expect(true).toBeType("baz")
           pw.expect({}).toBeType("qux")
           pw.expect(undefined).toBeType("quux")
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "error", message: `Argument for toBeType should be "string", "boolean", "number", "object", "undefined", "bigint", "symbol" or "function"` },
@@ -130,9 +139,10 @@ describe("toBeType", () => {
           pw.expect(true).not.toBeType("baz")
           pw.expect({}).not.toBeType("qux")
           pw.expect(undefined).not.toBeType("quux")
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "error", message: `Argument for toBeType should be "string", "boolean", "number", "object", "undefined", "bigint", "symbol" or "function"` },

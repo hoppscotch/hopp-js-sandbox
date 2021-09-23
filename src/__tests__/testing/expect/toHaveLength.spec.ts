@@ -1,4 +1,10 @@
-import { execTestScript } from "../../../test-runner"
+import { execTestScript, TestResponse } from "../../../test-runner"
+
+const fakeResponse: TestResponse = {
+  status: 200,
+  body: "hoi",
+  headers: []
+}
 
 describe("toHaveLength", () => {
   test("asserts true for valid lengths with no negation", () => {
@@ -7,9 +13,10 @@ describe("toHaveLength", () => {
         `
           pw.expect([1, 2, 3, 4]).toHaveLength(4)
           pw.expect([]).toHaveLength(0)
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "pass" },
@@ -25,9 +32,10 @@ describe("toHaveLength", () => {
         `
           pw.expect([]).toHaveLength(4)
           pw.expect([1, 2, 3, 4]).toHaveLength(0)
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "fail", message: "Expected the array to be of length '4'" },
@@ -43,9 +51,10 @@ describe("toHaveLength", () => {
         `
           pw.expect([1, 2, 3, 4]).not.toHaveLength(4)
           pw.expect([]).not.toHaveLength(0)
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "fail", message: "Expected the array to not be of length '4'" },
@@ -61,9 +70,10 @@ describe("toHaveLength", () => {
         `
           pw.expect([]).not.toHaveLength(4)
           pw.expect([1, 2, 3, 4]).not.toHaveLength(0)
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "pass" },
@@ -79,9 +89,10 @@ describe("toHaveLength", () => {
         `
           pw.expect(5).toHaveLength(0)
           pw.expect(true).toHaveLength(0)
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "error", message: "Expected toHaveLength to be called for an array or string" },
@@ -97,9 +108,10 @@ describe("toHaveLength", () => {
         `
           pw.expect(5).not.toHaveLength(0)
           pw.expect(true).not.toHaveLength(0)
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "error", message: "Expected toHaveLength to be called for an array or string" },
@@ -114,9 +126,10 @@ describe("toHaveLength", () => {
       execTestScript(
         `
           pw.expect([1, 2, 3, 4]).toHaveLength("a")
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "error", message: "Argument for toHaveLength should be a number" },
@@ -130,9 +143,10 @@ describe("toHaveLength", () => {
       execTestScript(
         `
           pw.expect([1, 2, 3, 4]).not.toHaveLength("a")
-        `
-      )
-    ).resolves.toEqual([
+        `,
+        fakeResponse
+      )()
+    ).resolves.toEqualRight([
       expect.objectContaining({
         expectResults: [
           { status: "error", message: "Argument for toHaveLength should be a number" },

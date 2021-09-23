@@ -1,4 +1,11 @@
-import { execTestScript } from "../../../test-runner"
+import { execTestScript, TestResponse } from "../../../test-runner"
+import "@relmify/jest-fp-ts"
+
+const fakeResponse: TestResponse = {
+  status: 200,
+  body: "hoi",
+  headers: []
+}
 
 describe("toBe", () => {
   describe("general assertion (no negation)", () => {
@@ -7,9 +14,10 @@ describe("toBe", () => {
         execTestScript(
           `
               pw.expect(2).toBe(2)
-            `
-        )
-      ).resolves.toEqual([
+          `,
+          fakeResponse
+        )()
+      ).resolves.toEqualRight([
         expect.objectContaining({
           expectResults: [{ status: "pass" }],
         }),
@@ -21,9 +29,10 @@ describe("toBe", () => {
         execTestScript(
           `
               pw.expect(2).toBe(4)
-            `
-        )
-      ).resolves.toEqual([
+          `,
+          fakeResponse
+        )()
+      ).resolves.toEqualRight([
         expect.objectContaining({
           expectResults: [{ status: "fail", message: "Expected '2' to be '4'" }],
         }),
@@ -36,10 +45,11 @@ describe("toBe", () => {
       return expect(
         execTestScript(
           `
-              pw.expect(2).not.toBe(2)
-            `
-        )
-      ).resolves.toEqual([
+            pw.expect(2).not.toBe(2)
+          `,
+          fakeResponse
+        )()
+      ).resolves.toEqualRight([
         expect.objectContaining({
           expectResults: [{
             status: "fail",
@@ -54,9 +64,10 @@ describe("toBe", () => {
         execTestScript(
           `
               pw.expect(2).not.toBe(4)
-            `
-        )
-      ).resolves.toEqual([
+          `,
+          fakeResponse
+        )()
+      ).resolves.toEqualRight([
         expect.objectContaining({
           expectResults: [{
             status: "pass",
@@ -72,9 +83,10 @@ test("strict checks types", () => {
     execTestScript(
       `
           pw.expect(2).toBe("2")
-        `
-    )
-  ).resolves.toEqual([
+        `,
+        fakeResponse
+    )()
+  ).resolves.toEqualRight([
     expect.objectContaining({
       expectResults: [{
         status: "fail",

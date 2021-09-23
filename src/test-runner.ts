@@ -1,4 +1,22 @@
+import { isLeft } from "fp-ts/lib/Either"
+import { pipe } from "fp-ts/lib/function"
+import { bindTo, bind, TaskEither, tryCatch, chain, right, left } from "fp-ts/lib/TaskEither"
 import * as qjs from "quickjs-emscripten"
+import { marshalObjectToVM } from "./utils"
+
+/**
+ * The response object structure exposed to the test script
+ */
+export type TestResponse = {
+  /** Status Code of the response */
+  status: number,
+  /** List of headers returned */
+  headers: { key: string, value: string }[],
+  /**
+   * Body of the response, this will be the JSON object if it is a JSON content type, else body string
+   */
+  body: string | object
+}
 
 /**
  * The result of an expectation statement
@@ -9,7 +27,7 @@ type ExpectResult =
 
 /**
  * An object defining the result of the execution of a
- * test blocK
+ * test block
  */
 export type TestDescriptor = {
   /**
@@ -264,63 +282,80 @@ function createExpectation(
   return resultHandle
 }
 
-export async function execTestScript(
-  testScript: string
-): Promise<TestDescriptor[]> {
-  const QuickJS = await qjs.getQuickJS()
-  const vm = QuickJS.createVm()
+export const execTestScript = (
+  testScript: string,
+  response: TestResponse
+): TaskEither<string, TestDescriptor[]> => pipe(
+  tryCatch(
+    async () => await qjs.getQuickJS(),
+    (reason) => `QuickJS initialization failed: ${reason}`
+  ),
+  chain(
+    // TODO: Make this more functional ?
+    (QuickJS) => {
+      const vm = QuickJS.createVm()
 
-  const pwHandle = vm.newObject()
+      const pwHandle = vm.newObject()
 
-  const testRunStack: TestDescriptor[] = [
-    { descriptor: "root", expectResults: [], children: [] },
-  ]
+      const testRunStack: TestDescriptor[] = [
+        { descriptor: "root", expectResults: [], children: [] },
+      ]
 
-  const testFuncHandle = vm.newFunction(
-    "test",
-    (descriptorHandle, testFuncHandle) => {
-      const descriptor = vm.getString(descriptorHandle)
+      const testFuncHandle = vm.newFunction(
+        "test",
+        (descriptorHandle, testFuncHandle) => {
+          const descriptor = vm.getString(descriptorHandle)
 
-      testRunStack.push({
-        descriptor,
-        expectResults: [],
-        children: [],
+          testRunStack.push({
+            descriptor,
+            expectResults: [],
+            children: [],
+          })
+
+          const result = vm.unwrapResult(vm.callFunction(testFuncHandle, vm.null))
+          result.dispose()
+
+          const child = testRunStack.pop() as TestDescriptor
+          testRunStack[testRunStack.length - 1].children.push(child)
+        }
+      )
+
+      const expectFnHandle = vm.newFunction("expect", (expectValueHandle) => {
+        const expectVal = vm.dump(expectValueHandle)
+
+        return {
+          value: createExpectation(vm, expectVal, false, testRunStack),
+        }
       })
 
-      const result = vm.unwrapResult(vm.callFunction(testFuncHandle, vm.null))
-      result.dispose()
+      // Marshal response object
+      const responseObjHandle = marshalObjectToVM(vm, response)
+      if (isLeft(responseObjHandle)) return left(`Response marshalling failed: ${responseObjHandle.left}`)
 
-      const child = testRunStack.pop() as TestDescriptor
-      testRunStack[testRunStack.length - 1].children.push(child)
+      vm.setProp(pwHandle, "response", responseObjHandle.right)
+      responseObjHandle.right.dispose()
+
+      vm.setProp(pwHandle, "expect", expectFnHandle)
+      expectFnHandle.dispose()
+
+      vm.setProp(pwHandle, "test", testFuncHandle)
+      testFuncHandle.dispose()
+
+      vm.setProp(vm.global, "pw", pwHandle)
+      pwHandle.dispose()
+
+      const evalRes = vm.evalCode(testScript)
+
+      if (evalRes.error) {
+        const errorData = vm.dump(evalRes.error)
+        evalRes.error.dispose()
+
+        return left(`Script evaluation failed: ${errorData}`)
+      }
+
+      vm.dispose()
+
+      return right(testRunStack)
     }
   )
-
-  const expectFnHandle = vm.newFunction("expect", (expectValueHandle) => {
-    const expectVal = vm.dump(expectValueHandle)
-
-    return {
-      value: createExpectation(vm, expectVal, false, testRunStack),
-    }
-  })
-
-  vm.setProp(pwHandle, "expect", expectFnHandle)
-  expectFnHandle.dispose()
-
-  vm.setProp(pwHandle, "test", testFuncHandle)
-  testFuncHandle.dispose()
-
-  vm.setProp(vm.global, "pw", pwHandle)
-  pwHandle.dispose()
-
-  const evalRes = vm.evalCode(testScript)
-  if (evalRes.error) {
-    const errorData = vm.dump(evalRes.error)
-    evalRes.error.dispose()
-
-    throw errorData
-  }
-
-  vm.dispose()
-
-  return testRunStack
-}
+)

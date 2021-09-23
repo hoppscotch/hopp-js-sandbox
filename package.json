@@ -1,6 +1,6 @@
 {
   "name": "@hoppscotch/js-sandbox",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JavaScript sandboxes for running external scripts used by Hoppscotch clients",
   "main": "./lib/index.js",
   "types": "./lib/",
@@ -14,14 +14,22 @@
     "clean": "npx tsc --build --clean",
     "prepublish": "npm run build"
   },
-  "keywords": ["hoppscotch", "sandbox", "js-sandbox", "apis", "test-runner"],
+  "keywords": [
+    "hoppscotch",
+    "sandbox",
+    "js-sandbox",
+    "apis",
+    "test-runner"
+  ],
   "author": "The Hoppscotch Team <support@hoppscotch.io> (https://hoppscotch.com/)",
   "license": "MIT",
   "dependencies": {
+    "fp-ts": "^2.11.3",
     "quickjs-emscripten": "^0.13.0"
   },
   "devDependencies": {
     "@digitak/esrun": "^1.2.4",
+    "@relmify/jest-fp-ts": "^1.1.1",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.5",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
@@ -30,10 +38,14 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "husky": "^7.0.0",
+    "io-ts": "^2.2.16",
     "jest": "^27.0.6",
     "prettier": "^2.3.2",
     "pretty-quick": "^3.1.1",
     "ts-jest": "^27.0.3",
     "typescript": "^4.3.5"
+  },
+  "jest": {
+    "setupFilesAfterEnv": ["@relmify/jest-fp-ts"]
   }
 }

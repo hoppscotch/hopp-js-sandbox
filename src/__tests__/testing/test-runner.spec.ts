@@ -1,4 +1,10 @@
-import { execTestScript } from "../../test-runner"
+import { execTestScript, TestResponse } from "../../test-runner"
+
+const fakeResponse: TestResponse = {
+  status: 200,
+  body: "hoi",
+  headers: []
+}
 
 describe("execTestScript function behavior", () => {
   test("returns a resolved promise for a valid test scripts with all green", () => {
@@ -12,9 +18,10 @@ describe("execTestScript function behavior", () => {
             pw.expect(size * 4).toBe(4000);
             pw.expect(size / 4).toBe(250);
           });
-        `
-      )
-    ).resolves.toBeDefined()
+        `,
+        fakeResponse
+      )()
+    ).resolves.toBeRight();
   })
 
   test("resolves for tests with failed expectations", () => {
@@ -28,9 +35,9 @@ describe("execTestScript function behavior", () => {
             pw.expect(size * 4).toBe(4000);
             pw.expect(size / 4).not.toBe(250);
           });
-        `
-      )
-    ).resolves.toBeDefined()
+        `, fakeResponse
+      )()
+    ).resolves.toBeRight()
   })
 
   // TODO: We need a more concrete behavior for this
@@ -45,8 +52,8 @@ describe("execTestScript function behavior", () => {
             pw.expect(size * 4).toBe(4000);
             pw.expect(size / 4).not.toBe(250);
           });
-        `
-      )
-    ).rejects.toBeDefined()
+        `, fakeResponse
+      )()
+    ).resolves.toBeLeft()
   })
 })

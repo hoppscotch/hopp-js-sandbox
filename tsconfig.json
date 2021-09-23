@@ -12,7 +12,8 @@
     },
     "types": [
       "@types/node",
-      "@types/jest"
+      "@types/jest",
+      "@relmify/jest-fp-ts"
     ],
     "outDir": "./lib/",
     "rootDir": "./src/",
@@ -20,6 +21,6 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["./src"],
+  "include": ["./src", "./src/global.d.ts"],
   "exclude": ["node_modules", "./src/__tests__", "./src/demo.ts"]
 }
