@@ -1,6 +1,6 @@
 import { isLeft } from "fp-ts/lib/Either"
 import { pipe } from "fp-ts/lib/function"
-import { bindTo, bind, TaskEither, tryCatch, chain, right, left } from "fp-ts/lib/TaskEither"
+import { TaskEither, tryCatch, chain, right, left } from "fp-ts/lib/TaskEither"
 import * as qjs from "quickjs-emscripten"
 import { marshalObjectToVM } from "./utils"
 

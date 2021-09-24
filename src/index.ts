@@ -1,5 +1,6 @@
 import { pipe } from "fp-ts/lib/function"
 import { chain, right } from "fp-ts/lib/TaskEither"
+import { execPreRequestScript } from "./preRequest"
 import { execTestScript, TestResponse } from "./test-runner"
 
 /**
@@ -14,3 +15,11 @@ export const runTestScript = (
   execTestScript(testScript, response),
   chain((results) => right(results[0])) // execTestScript returns an array of descriptors with a single element (extract that)
 )
+
+/**
+ * Executes a given pre-request script on the sandbox
+ * @param preRequestScript The script to run
+ * @param env The envirionment variables active
+ * @returns A TaskEither with an error message or an array of the final environments with the all the script values applied
+ */
+export const runPreRequestScript = execPreRequestScript
