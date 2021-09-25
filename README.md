@@ -1,12 +1,14 @@
 <div align="center">
   <a href="https://hoppscotch.io">
-    <img height=64 src="https://raw.githubusercontent.com/hoppscotch/hoppscotch/main/static/logo.png" alt="The Hoppscotch UFO logo" />
+    <img height=64 src="https://avatars.githubusercontent.com/u/56705483" alt="The Hoppscotch logo" />
   </a>
 </div>
 <div align="center">
 
 # Hoppscotch JavaScript Sandbox <font size=2><sup>ALPHA</sup></font>
 
+# NOTE: This package has been archived and is outdated. Please refer to the [hoppscotch-js-sandbox](https://github.com/hoppscotch/hoppscotch/tree/main/packages/hoppscotch-js-sandbox) in the Hoppscotch monorepo for the latest code.
+  
 </div>
 
 This package deals with providing a JavaScript sandbox for executing various security sensitive external scripts.
